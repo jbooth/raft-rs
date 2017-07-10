@@ -1,0 +1,7 @@
+[package]
+name = "raft"
+version = "0.1.0"
+authors = ["Jay Booth <jaybooth@gmail.com>"]
+
+[dependencies]
+chashmap = "2.2.0"
