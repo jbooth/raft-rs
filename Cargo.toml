@@ -5,3 +5,5 @@ authors = ["Jay Booth <jaybooth@gmail.com>"]
 
 [dependencies]
 chashmap = "2.2.0"
+vecio = "0.1.0"
+byteorder = "1.1.0"
