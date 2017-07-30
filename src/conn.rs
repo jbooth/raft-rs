@@ -102,17 +102,17 @@ impl PeerConn {
         {
             // assemble final &[&[u8]] for send
             // small allocation, could optimize
-            let mut toWrite: &mut[&[u8]] = &mut (Vec::with_capacity(args.len() + 1));
+            let mut toWrite: &mut [&[u8]] = &mut (Vec::with_capacity(args.len() + 1));
             toWrite[0] = &headerBuff;
-            toWrite[1 .. ].copy_from_slice(args);
+            toWrite[1..].copy_from_slice(args);
 
             use vecio::Rawv;
             return match self.s.writev(&toWrite) {
                 Ok(_) => return Ok(res),
                 // on error, mark so we shut down and die
                 Err(e) => return Err(self.setIoError(e)),
-            }
-                
+            };
+
         }
         return Ok(res);
     }
@@ -154,7 +154,6 @@ impl PeerConn {
             }
 
             // read from socket
-
             // handle timeout
             // check pending resp times
             // if any exceeded actual max timeout, set error flag
@@ -171,19 +170,12 @@ impl PeerConn {
             // should this ever terminate?
         }
         // clean up pending futures, close socket and die
-        match self.checkErrState() {
-            Ok(_) => (),
-            Err(e) => {
-                let iter = pendingResp.into_iter();
-                
-                let numOkNumErr = iter.map(|_id, future| {
-                    // TODO what to do here?
-                    let trySend = future.send.send(Err(e))
-                    if trySend.is_err() {
-                        
-                    }
-                    1
-                }).fold(0, |acc, &x| acc + x);
+        let err: Result<Box<[u8]>, ConnError>  = Err(ConnError::CLOSED); //self.checkErrState();
+        
+        for (_reqno, resp) in (&mut self.pendingResp).into_iter().by_ref() {
+            match resp.send.send(err.clone()) {
+                        Ok(_) => (),
+                        Err(e) => (), // TODO log
             }
         }
     }
@@ -191,7 +183,7 @@ impl PeerConn {
 
 struct msgHeader {
     argLenths: Vec<u32>,
-    msgType: u8
+    msgType: u8,
 }
 
 

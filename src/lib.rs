@@ -4,14 +4,14 @@ extern crate chashmap;
 extern crate vecio;
 extern crate byteorder;
 
-struct logEntry {
+struct logEntryHead {
     term: u64,
     leaderId: u64,
     prevLogIdx: u64,
     prevLogTerm: u64,
     leaderCommitIdx: u64,
-    entries: 
 }
+
 trait RaftApp {
     fn Apply();
 }
